@@ -29,7 +29,7 @@ return [
     | Which directories to scan for missing translations.
     |
     */
-    'scan_paths' => [app_path(), resource_path()],
+    'paths' => [app_path(), resource_path()],
 
     /*
     |--------------------------------------------------------------------------
@@ -39,7 +39,7 @@ return [
     | Which directories to exclude when scanning for missing translations.
     |
     */
-    'scan_excluded_paths' => [],
+    'excluded_paths' => [],
 
     /*
     |--------------------------------------------------------------------------
@@ -50,4 +50,14 @@ return [
     |
     */
     'excluded_languages' => ['en'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Languages path
+    |--------------------------------------------------------------------------
+    |
+    | Where are the language .json files located
+    |
+    */
+    'languages_path' => resource_path('lang'),
 ];

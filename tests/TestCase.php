@@ -1,8 +1,8 @@
 <?php
 
-namespace Cdruc\Langscanner\Tests;
+namespace Druc\Langscanner\Tests;
 
-use Cdruc\Langscanner\LangscannerServiceProvider;
+use Druc\Langscanner\LangscannerServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra

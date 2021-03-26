@@ -1,68 +1,56 @@
 <?php
 
-namespace Cdruc\Langscanner\Commands;
+namespace Druc\Langscanner\Commands;
 
-use Cdruc\Langscanner\Langscanner;
+use Druc\Langscanner\ExistingTranslations;
+use Druc\Langscanner\FileTranslations;
+use Druc\Langscanner\MissingTranslations;
+use Druc\Langscanner\RequiredLanguages;
+use Druc\Langscanner\RequiredTranslations;
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 
 class LangscannerCommand extends Command
 {
-    protected Langscanner $langscanner;
-
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'langscanner';
+    protected $description = "Finds keys without a corresponding translations and writes them into the translation (json) files.";
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'List all translation keys which don\'t have a corresponding translation';
-
-    public function __construct(Langscanner $langscanner)
-    {
-        parent::__construct();
-        $this->langscanner = $langscanner;
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
     public function handle()
     {
-        $missingTranslations = $this->langscanner->missingTranslations();
-
-        if (empty($missingTranslations)) {
-            return $this->info("No missing translations were detected.");
-        }
-
+        $headers = ["Language", "Key", "Path"];
         $rows = [];
 
-        // set some headers for the table of results
-        $headers = ["Language", "Type", "Group", "Key"];
+        $languages = new RequiredLanguages(
+            new Filesystem,
+            config('langscanner.languages_path'),
+            config('langscanner.excluded_languages')
+        );
 
-        // iterate over each of the missing languages
-        foreach ($missingTranslations as $language => $types) {
-            // iterate over each of the file types (json or array)
-            foreach ($types as $type => $keys) {
-                // iterate over each of the keys
-                foreach ($keys as $key => $value) {
-                    // populate the array with the relevant data to fill the table
-                    foreach ($value as $k => $v) {
-                        $rows[] = [$language, $type, $key, $k];
-                    }
-                }
+        $requiredTranslations = new RequiredTranslations(
+            new Filesystem,
+            config('langscanner.paths'),
+            config('langscanner.excluded_paths'),
+            config('langscanner.translation_methods')
+        );
+
+        foreach ($languages->toArray() as $language) {
+            $missingTranslations = new MissingTranslations(
+                $requiredTranslations,
+                new ExistingTranslations(
+                    new Filesystem,
+                    config('langscanner.languages_path'),
+                    $language
+                )
+            );
+
+            foreach ($missingTranslations->toArray() as $key => $path) {
+                $rows[] = [$language, $key, $path];
             }
+
+            (new FileTranslations(config('langscanner.languages_path')."/$language.json"))
+                ->update($missingTranslations);
         }
 
-        // render the table of results
         $this->table($headers, $rows);
     }
 }

@@ -1,7 +1,7 @@
 # laravel-langscanner
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/cdruc/laravel-langscanner.svg?style=flat-square)](https://packagist.org/packages/cdruc/laravel-langscanner)
-[![Total Downloads](https://img.shields.io/packagist/dt/cdruc/laravel-langscanner.svg?style=flat-square)](https://packagist.org/packages/cdruc/laravel-langscanner)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/druc/laravel-langscanner.svg?style=flat-square)](https://packagist.org/packages/druc/laravel-langscanner)
+[![Total Downloads](https://img.shields.io/packagist/dt/druc/laravel-langscanner.svg?style=flat-square)](https://packagist.org/packages/druc/laravel-langscanner)
 
 ## Usage
 
@@ -16,7 +16,7 @@ php artisan langscanner
 You can install the package via composer:
 
 ```bash
-composer require cdruc/laravel-langscanner
+composer require druc/laravel-langscanner
 ```
 
 ## Credits

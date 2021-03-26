@@ -1,8 +1,8 @@
 <?php
 
-namespace Cdruc\Langscanner\Commands;
+namespace Druc\Langscanner\Commands;
 
-use Cdruc\Langscanner\Langscanner;
+use Druc\Langscanner\Langscanner;
 use Illuminate\Console\Command;
 
 class LangscannerCommand extends Command

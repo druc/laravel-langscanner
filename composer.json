@@ -1,11 +1,11 @@
 {
-    "name": "cdruc/laravel-langscanner",
+    "name": "druc/laravel-langscanner",
     "description": "Scan missing language translations.",
     "keywords": [
-        "cdruc",
+        "druc",
         "laravel-langscanner"
     ],
-    "homepage": "https://github.com/cdruc/laravel-langscanner",
+    "homepage": "https://github.com/druc/laravel-langscanner",
     "license": "MIT",
     "authors": [
         {
@@ -29,12 +29,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Cdruc\\Langscanner\\": "src"
+            "Druc\\Langscanner\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Cdruc\\Langscanner\\Tests\\": "tests"
+            "Druc\\Langscanner\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -47,7 +47,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Cdruc\\Langscanner\\LangscannerServiceProvider"
+                "Druc\\Langscanner\\LangscannerServiceProvider"
             ]
         }
     },

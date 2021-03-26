@@ -1,6 +1,6 @@
 <?php
 
-namespace Cdruc\Langscanner;
+namespace Druc\Langscanner;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;

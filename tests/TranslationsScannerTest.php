@@ -1,8 +1,8 @@
 <?php
 
-namespace Cdruc\Langscanner\Tests;
+namespace Druc\Langscanner\Tests;
 
-use Cdruc\Langscanner\TranslationsScanner;
+use Druc\Langscanner\TranslationsScanner;
 
 class TranslationsScannerTest extends TestCase
 {

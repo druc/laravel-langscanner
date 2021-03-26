@@ -1,8 +1,8 @@
 <?php
 
-namespace Cdruc\Langscanner;
+namespace Druc\Langscanner;
 
-use Cdruc\Langscanner\Commands\LangscannerCommand;
+use Druc\Langscanner\Commands\LangscannerCommand;
 use Illuminate\Filesystem\Filesystem;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;

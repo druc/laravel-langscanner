@@ -12,19 +12,13 @@ use Illuminate\Filesystem\Filesystem;
 
 class LangscannerCommand extends Command
 {
-    protected $signature = 'langscanner';
+    protected $signature = 'langscanner {language?}';
     protected $description = "Finds keys without a corresponding translations and writes them into the translation (json) files.";
 
     public function handle()
     {
         $headers = ["Language", "Key", "Path"];
         $rows = [];
-
-        $languages = new RequiredLanguages(
-            new Filesystem,
-            config('langscanner.languages_path'),
-            config('langscanner.excluded_languages')
-        );
 
         $requiredTranslations = new RequiredTranslations(
             new Filesystem,
@@ -33,7 +27,17 @@ class LangscannerCommand extends Command
             config('langscanner.translation_methods')
         );
 
-        foreach ($languages->toArray() as $language) {
+        if ($this->argument('language')) {
+            $languages = [$this->argument('language')];
+        } else {
+            $languages = (new RequiredLanguages(
+                new Filesystem,
+                config('langscanner.languages_path'),
+                config('langscanner.excluded_languages')
+            ))->toArray();
+        }
+
+        foreach ($languages as $language) {
             $missingTranslations = new MissingTranslations(
                 $requiredTranslations,
                 new ExistingTranslations(

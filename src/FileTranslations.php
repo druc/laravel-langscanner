@@ -13,8 +13,11 @@ class FileTranslations
 
     public function update(MissingTranslations $missingTranslations)
     {
-        $existingTranslations = file_get_contents($this->path);
-        $existingTranslations = json_decode($existingTranslations, true);
+        try {
+            $existingTranslations = json_decode(file_get_contents($this->path), true);
+        } catch (\Exception $e) {
+            $existingTranslations = [];
+        }
 
         // Sets keys to an empty string: ['needs translation' => '', etc]
         $unfilledTranslations = array_fill_keys(array_keys($missingTranslations->toArray()), '');

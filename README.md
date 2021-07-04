@@ -5,22 +5,24 @@
 
 This package scans your project for missing translation keys and then writes them into individual json files for you to fill in.
 
-## Usage
-
-Scan your project for missing translations:
-
-```
-php artisan langscanner
-// outputs the translations
-// writes them to translation files: en.json. nl.json, de.json, etc.
-```
-
 ## Installation
 
 You can install the package via composer:
 
 ```bash
 composer require druc/laravel-langscanner
+```
+
+## Usage
+
+Scan your project for missing translations:
+
+```
+// outputs and writes translations for the specified language (dutch)
+php artisan langscanner nl
+
+// outputs and writes translations in the existing {language}.json files
+php artisan langscanner
 ```
 
 ## Credits

@@ -11,7 +11,7 @@ class ExistingTranslations
     private string $language;
     private string $languagesPath;
 
-    public function __construct(Filesystem $disk, string $languagesPath, string $language)
+    public function  __construct(Filesystem $disk, string $languagesPath, string $language)
     {
         $this->disk = $disk;
         $this->language = $language;

@@ -13,7 +13,7 @@ use Illuminate\Filesystem\Filesystem;
 class LangscannerCommand extends Command
 {
     protected $signature = 'langscanner {language?}';
-    protected $description = "Finds keys without a corresponding translations and writes them into the translation (json) files.";
+    protected $description = "Finds keys without a corresponding translation and writes them into the translation (json) files.";
 
     public function handle()
     {
@@ -39,12 +39,12 @@ class LangscannerCommand extends Command
 
         foreach ($languages as $language) {
             $missingTranslations = new MissingTranslations(
-                $requiredTranslations,
-                new ExistingTranslations(
+                array_merge($requiredTranslations->toArray(),  json_decode(file_get_contents(config('langscanner.languages_path') . '/en.json'), true)),
+                (new ExistingTranslations(
                     new Filesystem,
                     config('langscanner.languages_path'),
                     $language
-                )
+                ))->toArray()
             );
 
             foreach ($missingTranslations->toArray() as $key => $path) {

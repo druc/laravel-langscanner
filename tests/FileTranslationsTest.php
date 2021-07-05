@@ -13,18 +13,16 @@ class FileTranslationsTest extends TestCase
         $path = __DIR__.'/fixtures/lang/es.json';
         $originalContent = file_get_contents($path);
 
-        $missingTranslations = $this->createMock(MissingTranslations::class);
-        $missingTranslations->method('toArray')
-            ->willReturn([
-                "Missing translation" => "app.blade.php"
-            ]);
-
         $fileTranslations = new FileTranslations($path);
-        $fileTranslations->update($missingTranslations);
+        $fileTranslations->update([
+            "Missing translation" => "",
+            "Missing translation2" => "this one has content",
+        ]);
 
         $updatedTranslations = json_decode(file_get_contents($path), true);
 
         $this->assertEquals("", $updatedTranslations["Missing translation"]);
+        $this->assertEquals("this one has content", $updatedTranslations["Missing translation2"]);
 
         // Restore original content
         file_put_contents($path, $originalContent);

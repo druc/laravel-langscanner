@@ -4,10 +4,10 @@ namespace Druc\Langscanner;
 
 class MissingTranslations
 {
-    private RequiredTranslations $requiredTranslations;
-    private ExistingTranslations $existingTranslations;
+    private array $requiredTranslations;
+    private array $existingTranslations;
 
-    public function __construct(RequiredTranslations $requiredTranslations, ExistingTranslations $existingTranslations)
+    public function __construct(array $requiredTranslations, array $existingTranslations)
     {
         $this->requiredTranslations = $requiredTranslations;
         $this->existingTranslations = $existingTranslations;
@@ -15,12 +15,10 @@ class MissingTranslations
 
     public function toArray(): array
     {
-        $requiredTranslations = $this->requiredTranslations->toArray();
-        $existingTranslations = $this->existingTranslations->toArray();
         $missing = [];
 
-        foreach ($requiredTranslations as $key => $value) {
-            if (empty($existingTranslations[$key])) {
+        foreach ($this->requiredTranslations as $key => $value) {
+            if (empty($this->existingTranslations[$key])) {
                 $missing[$key] = $value;
             }
         }

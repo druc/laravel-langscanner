@@ -50,14 +50,4 @@ return [
     |
     */
     'excluded_languages' => ['en'],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Languages path
-    |--------------------------------------------------------------------------
-    |
-    | Where are the language .json files located
-    |
-    */
-    'languages_path' => resource_path('lang'),
 ];

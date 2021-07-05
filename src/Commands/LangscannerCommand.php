@@ -32,17 +32,17 @@ class LangscannerCommand extends Command
         } else {
             $languages = (new RequiredLanguages(
                 new Filesystem,
-                config('langscanner.languages_path'),
+                resource_path('lang'),
                 config('langscanner.excluded_languages')
             ))->toArray();
         }
 
         foreach ($languages as $language) {
             $missingTranslations = new MissingTranslations(
-                array_merge($requiredTranslations->toArray(),  json_decode(file_get_contents(config('langscanner.languages_path') . '/en.json'), true)),
+                array_merge($requiredTranslations->toArray(), json_decode(file_get_contents(resource_path('lang').'/en.json'), true)),
                 (new ExistingTranslations(
                     new Filesystem,
-                    config('langscanner.languages_path'),
+                    resource_path('lang'),
                     $language
                 ))->toArray()
             );
@@ -53,7 +53,7 @@ class LangscannerCommand extends Command
 
             $missingTranslations = array_fill_keys(array_keys($missingTranslations->toArray()), '');
 
-            (new FileTranslations(config('langscanner.languages_path')."/$language.json"))
+            (new FileTranslations(resource_path("lang/$language.json")))
                 ->update($missingTranslations);
         }
 

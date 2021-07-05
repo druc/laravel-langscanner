@@ -4,10 +4,9 @@ namespace Druc\Langscanner\Commands;
 
 use Druc\Langscanner\FileTranslations;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class LangscannerInitCommand extends Command
 {
@@ -16,35 +15,38 @@ class LangscannerInitCommand extends Command
 
     public function handle()
     {
-        if (!File::isDirectory(config('langscanner.languages_path').'/en')) {
-            $this->info(config('langscanner.languages_path').'/en' . ' does not exist.');
+        $directories = array_filter(File::directories(resource_path('lang')), function ($path) {
+            return !Str::endsWith($path, 'vendor');
+        });
+
+        if (!count($directories)) {
+            $this->info('Done.');
             return;
         }
 
-        App::setLocale('en');
+        foreach ($directories as $directory) {
+            $langFiles = File::allFiles($directory);
+            $translations = [];
 
-        $langFiles = (new Filesystem())->allFiles(config('langscanner.languages_path').'/en');
+            foreach ($langFiles as $file) {
+                $translations[$file->getFilenameWithoutExtension()] = File::getRequire($file->getRealPath());
+            }
 
-        $translations = [];
+            $translations = array_filter(Arr::dot($translations), function ($item) {
+                return is_string($item);
+            });
 
-        foreach ($langFiles as $file) {
-            $translations[$file->getFilenameWithoutExtension()] = __($file->getFilenameWithoutExtension());
+            (new FileTranslations("{$directory}.json"))->update($translations);
         }
 
-        $translations = array_filter(Arr::dot($translations), function ($item) {
-            return is_string($item);
-        });
+        $answer = $this->ask('Delete old PHP translations directories? (y/n)');
 
-        (new FileTranslations(config('langscanner.languages_path')."/en.json"))
-            ->update($translations);
-
-        if ($answer = $this->ask('Delete lang/en directory? (y/n)')) {
-            if (strtolower($answer) === 'y') {
-                File::deleteDirectory(config("langscanner.languages_path").'/en');
-                $this->info('Directory deleted.');
-            } else {
-                $this->info('Directory has been kept.');
+        if (strtolower($answer) === 'y') {
+            foreach ($directories as $directory) {
+                File::deleteDirectory($directory);
             }
         }
+
+        $this->info('Done.');
     }
 }

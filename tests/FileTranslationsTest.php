@@ -3,7 +3,6 @@
 namespace Druc\Langscanner\Tests;
 
 use Druc\Langscanner\FileTranslations;
-use Druc\Langscanner\MissingTranslations;
 
 class FileTranslationsTest extends TestCase
 {

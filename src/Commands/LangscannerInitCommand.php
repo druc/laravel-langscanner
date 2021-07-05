@@ -3,40 +3,48 @@
 namespace Druc\Langscanner\Commands;
 
 use Druc\Langscanner\FileTranslations;
+use Druc\Langscanner\MergeJsonTranslationKeys;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class LangscannerInitCommand extends Command
 {
     protected $signature = 'langscanner:init';
-    protected $description = "The init command will move all en php translations into an en.json file";
+    protected $description = "This will move PHP translations into dedicated JSON files";
 
     public function handle()
     {
-        $directories = array_filter(File::directories(resource_path('lang')), function ($path) {
-            return !Str::endsWith($path, 'vendor');
-        });
+        $directories = Collection::make(File::directories(resource_path('lang')))
+            ->filter(function ($path) {
+                return !Str::endsWith($path, 'vendor');
+            });
 
-        if (!count($directories)) {
+        if (!$directories->count()) {
             $this->info('Done.');
             return;
         }
 
-        foreach ($directories as $directory) {
-            $translations = [];
+        // move php to json
+        $directories->each(function ($path) {
+            $translations = Collection::make(File::allFiles($path))
+                ->filter(function ($file) {
+                    return $file->getExtension() === 'php';
+                })
+                ->reduce(function ($carry, $file) {
+                    return $carry->merge(Arr::dot([
+                        $file->getFilenameWithoutExtension() => File::getRequire($file->getRealPath())
+                    ]));
+                }, collect([]))->filter(function ($item) {
+                    return is_string($item);
+                })->toArray();
 
-            foreach (File::allFiles($directory) as $file) {
-                $translations[$file->getFilenameWithoutExtension()] = File::getRequire($file->getRealPath());
-            }
+            (new FileTranslations("{$path}.json"))->update($translations);
+        });
 
-            $translations = array_filter(Arr::dot($translations), function ($item) {
-                return is_string($item);
-            });
-
-            (new FileTranslations("{$directory}.json"))->update($translations);
-        }
+        (new MergeJsonTranslationKeys())->merge();
 
         $answer = $this->ask('Delete old PHP translations directories? (y/n)');
 

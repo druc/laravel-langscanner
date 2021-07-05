@@ -2,13 +2,13 @@
 
 namespace Druc\Langscanner\Commands;
 
-use Druc\Langscanner\ExistingTranslations;
 use Druc\Langscanner\FileTranslations;
-use Druc\Langscanner\MissingTranslations;
+use Druc\Langscanner\MergeJsonTranslationKeys;
 use Druc\Langscanner\RequiredLanguages;
 use Druc\Langscanner\RequiredTranslations;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\File;
 
 class LangscannerCommand extends Command
 {
@@ -17,9 +17,6 @@ class LangscannerCommand extends Command
 
     public function handle()
     {
-        $headers = ["Language", "Key", "Path"];
-        $rows = [];
-
         $requiredTranslations = (new RequiredTranslations(
             new Filesystem,
             config('langscanner.paths'),
@@ -37,27 +34,39 @@ class LangscannerCommand extends Command
             ))->toArray();
         }
 
-        foreach ($languages as $language) {
+        $headers = ["Language", "Key", "Path"];
+        $rows = [];
 
-            $missingTranslations = (new MissingTranslations(
-                $requiredTranslations,
-                (new ExistingTranslations(
-                    new Filesystem,
-                    resource_path('lang'),
-                    $language
-                ))->toArray()
-            ))->toArray();
+        foreach ($languages as $language) {
+            $existingTranslations = json_decode(File::get(resource_path("lang/$language.json")), true);
+
+            $missingTranslations = $this->missingTranslations($requiredTranslations, $existingTranslations);
 
             foreach ($missingTranslations as $key => $path) {
                 $rows[] = [$language, $key, $path];
             }
 
+            // sets missing translation keys to empty string
             $missingTranslations = array_fill_keys(array_keys($missingTranslations), '');
 
-            (new FileTranslations(resource_path("lang/$language.json")))
-                ->update($missingTranslations);
+            (new FileTranslations(resource_path("lang/$language.json")))->update($missingTranslations);
         }
 
+        (new MergeJsonTranslationKeys())->merge();
+
         $this->table($headers, $rows);
+    }
+
+    private function missingTranslations(array $required, array $existing): array
+    {
+        $missing = [];
+
+        foreach ($required as $key => $value) {
+            if (empty($existing[$key])) {
+                $missing[$key] = $value;
+            }
+        }
+
+        return $missing;
     }
 }

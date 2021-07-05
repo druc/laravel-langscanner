@@ -4,7 +4,6 @@ namespace Druc\Langscanner;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class RequiredLanguages
 {
@@ -25,9 +24,11 @@ class RequiredLanguages
             ->filter(function ($file) {
                 return $file->getExtension() === 'json';
             })->map(function ($file) {
-                return Str::replaceLast('.json', '', $file->getBasename());
+                return $file->getFilenameWithoutExtension();
             })->filter(function ($lang) {
                 return !in_array($lang, $this->excludedLanguages);
-            })->values()->toArray();
+            })
+            ->values()
+            ->toArray();
     }
 }

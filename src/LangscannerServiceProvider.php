@@ -3,6 +3,7 @@
 namespace Druc\Langscanner;
 
 use Druc\Langscanner\Commands\LangscannerCommand;
+use Druc\Langscanner\Commands\LangscannerInitCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -16,6 +17,7 @@ class LangscannerServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-langscanner')
             ->hasConfigFile()
-            ->hasCommand(LangscannerCommand::class);
+            ->hasCommand(LangscannerCommand::class)
+            ->hasCommand(LangscannerInitCommand::class);
     }
 }

@@ -11,7 +11,7 @@ class FileTranslations
         $this->path = $path;
     }
 
-    public function update(MissingTranslations $missingTranslations)
+    public function update(array $missingTranslations)
     {
         try {
             $existingTranslations = json_decode(file_get_contents($this->path), true);
@@ -19,10 +19,7 @@ class FileTranslations
             $existingTranslations = [];
         }
 
-        // Sets keys to an empty string: ['needs translation' => '', etc]
-        $unfilledTranslations = array_fill_keys(array_keys($missingTranslations->toArray()), '');
-
-        $mergedTranslations = array_merge($existingTranslations, $unfilledTranslations);
+        $mergedTranslations = array_merge($existingTranslations, $missingTranslations);
         $mergedTranslations = json_encode($mergedTranslations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         file_put_contents($this->path, $mergedTranslations);

@@ -51,6 +51,8 @@ class LangscannerCommand extends Command
                 $rows[] = [$language, $key, $path];
             }
 
+            $missingTranslations = array_fill_keys(array_keys($missingTranslations->toArray()), '');
+
             (new FileTranslations(config('langscanner.languages_path')."/$language.json"))
                 ->update($missingTranslations);
         }

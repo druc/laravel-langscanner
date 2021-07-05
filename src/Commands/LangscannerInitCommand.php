@@ -25,10 +25,9 @@ class LangscannerInitCommand extends Command
         }
 
         foreach ($directories as $directory) {
-            $langFiles = File::allFiles($directory);
             $translations = [];
 
-            foreach ($langFiles as $file) {
+            foreach (File::allFiles($directory) as $file) {
                 $translations[$file->getFilenameWithoutExtension()] = File::getRequire($file->getRealPath());
             }
 

@@ -20,12 +20,12 @@ class LangscannerCommand extends Command
         $headers = ["Language", "Key", "Path"];
         $rows = [];
 
-        $requiredTranslations = new RequiredTranslations(
+        $requiredTranslations = (new RequiredTranslations(
             new Filesystem,
             config('langscanner.paths'),
             config('langscanner.excluded_paths'),
             config('langscanner.translation_methods')
-        );
+        ))->toArray();
 
         if ($this->argument('language')) {
             $languages = [$this->argument('language')];
@@ -38,20 +38,21 @@ class LangscannerCommand extends Command
         }
 
         foreach ($languages as $language) {
-            $missingTranslations = new MissingTranslations(
-                array_merge($requiredTranslations->toArray(), json_decode(file_get_contents(resource_path('lang').'/en.json'), true)),
+
+            $missingTranslations = (new MissingTranslations(
+                $requiredTranslations,
                 (new ExistingTranslations(
                     new Filesystem,
                     resource_path('lang'),
                     $language
                 ))->toArray()
-            );
+            ))->toArray();
 
-            foreach ($missingTranslations->toArray() as $key => $path) {
+            foreach ($missingTranslations as $key => $path) {
                 $rows[] = [$language, $key, $path];
             }
 
-            $missingTranslations = array_fill_keys(array_keys($missingTranslations->toArray()), '');
+            $missingTranslations = array_fill_keys(array_keys($missingTranslations), '');
 
             (new FileTranslations(resource_path("lang/$language.json")))
                 ->update($missingTranslations);

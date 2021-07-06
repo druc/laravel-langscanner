@@ -3,7 +3,10 @@
 namespace Druc\Langscanner;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Webmozart\Assert\Assert;
 
 class RequiredTranslations
 {
@@ -13,16 +16,16 @@ class RequiredTranslations
     private array $excludedPaths;
     private array $translations;
 
-    public function __construct(
-        Filesystem $disk,
-        array $paths,
-        array $excludedPaths,
-        array $translationMethods
-    ) {
+    public function __construct(Filesystem $disk, $options)
+    {
+        Assert::keyExists($options, 'paths');
+        Assert::keyExists($options, 'excluded_paths');
+        Assert::keyExists($options, 'translation_methods');
+
         $this->disk = $disk;
-        $this->paths = $paths;
-        $this->excludedPaths = $excludedPaths;
-        $this->translationMethods = $translationMethods;
+        $this->paths = $options['paths'];
+        $this->excludedPaths = $options['excluded_paths'];
+        $this->translationMethods = $options['translation_methods'];
     }
 
     public function toArray(): array
@@ -56,6 +59,9 @@ class RequiredTranslations
             }
         }
 
+        // exclude php translations
+        $results = array_diff_key($results, $this->getPhpTranslations());
+
         return $this->translations = $results;
     }
 
@@ -72,5 +78,21 @@ class RequiredTranslations
         }
 
         return $files;
+    }
+
+    private function getPhpTranslations(): array
+    {
+        return Collection::make($this->disk->allFiles(resource_path('lang')))
+            ->filter(function ($file) {
+                return $file->getExtension() === 'php';
+            })->reduce(function ($carry, $file) {
+                $translations = $this->disk->getRequire($file->getRealPath());
+
+                return $carry->merge(Arr::dot([
+                    $file->getFilenameWithoutExtension() => $translations
+                ]));
+            }, collect())->filter(function ($item) {
+                return is_string($item);
+            })->toArray();
     }
 }

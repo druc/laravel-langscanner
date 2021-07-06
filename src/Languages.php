@@ -5,22 +5,22 @@ namespace Druc\Langscanner;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 
-class RequiredLanguages
+class Languages
 {
     private Filesystem $disk;
-    private string $languagesPath;
     private array $excludedLanguages;
+    private string $path;
 
-    public function __construct(Filesystem $disk, string $languagesPath, array $excludedLanguages)
+    public function __construct(Filesystem $disk, string $path, array $excludedLanguages)
     {
         $this->disk = $disk;
-        $this->languagesPath = $languagesPath;
+        $this->path = $path;
         $this->excludedLanguages = $excludedLanguages;
     }
 
     public function toArray(): array
     {
-        return Collection::make($this->disk->files($this->languagesPath))
+        return Collection::make($this->disk->files($this->path))
             ->filter(function ($file) {
                 return $file->getExtension() === 'json';
             })->map(function ($file) {

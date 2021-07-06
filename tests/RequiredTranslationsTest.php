@@ -12,9 +12,11 @@ class RequiredTranslationsTest extends TestCase
     {
         $requiredTranslations = new RequiredTranslations(
             new Filesystem,
-            [__DIR__.'/fixtures/test-files'],
-            [],
-            ['__', 'trans', 'trans_choice', '@lang', 'Lang::get']
+            [
+                'paths' => [__DIR__.'/fixtures/test-files'],
+                'excluded_paths' => [],
+                'translation_methods' => ['__', 'trans', 'trans_choice', '@lang', 'Lang::get']
+            ],
         );
 
         $this->assertEquals([

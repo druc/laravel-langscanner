@@ -13,9 +13,9 @@ class FileTranslations
 
     public function update(array $translations)
     {
-        try {
+        if (file_exists($this->path)) {
             $existingTranslations = json_decode(file_get_contents($this->path), true);
-        } catch (\Exception $e) {
+        } else {
             $existingTranslations = [];
         }
 

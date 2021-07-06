@@ -17,7 +17,6 @@ class LangscannerServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-langscanner')
             ->hasConfigFile()
-            ->hasCommand(LangscannerCommand::class)
-            ->hasCommand(LangscannerInitCommand::class);
+            ->hasCommand(LangscannerCommand::class);
     }
 }

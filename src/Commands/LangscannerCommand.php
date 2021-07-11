@@ -12,29 +12,22 @@ class LangscannerCommand extends Command
 {
     protected $signature = 'langscanner {language?}';
     protected $description = "Finds keys without a corresponding translation and writes them into the translation (json) files.";
-    private Filesystem $filesystem;
 
-    public function __construct(Filesystem $filesystem)
-    {
-        parent::__construct();
-        $this->filesystem = $filesystem;
-    }
-
-    public function handle()
+    public function handle(Filesystem $filesystem)
     {
         if ($this->argument('language')) {
             $languages = [$this->argument('language')];
         } else {
-            $languages = (new Languages($this->filesystem, resource_path('lang'), config('langscanner.excluded_languages')))->toArray();
+            $languages = (new Languages($filesystem, resource_path('lang'), config('langscanner.excluded_languages')))->toArray();
         }
 
-        $requiredTranslations = (new RequiredTranslations($this->filesystem, config('langscanner')))->toArray();
+        $requiredTranslations = (new RequiredTranslations($filesystem, config('langscanner')))->toArray();
 
         $rows = [];
 
         foreach ($languages as $language) {
-            if ($this->filesystem->exists(resource_path("lang/$language.json"))) {
-                $existingTranslations = json_decode($this->filesystem->get(resource_path("lang/$language.json")), true);
+            if ($filesystem->exists(resource_path("lang/$language.json"))) {
+                $existingTranslations = json_decode($filesystem->get(resource_path("lang/$language.json")), true);
             } else {
                 $existingTranslations = [];
             }

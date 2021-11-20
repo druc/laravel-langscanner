@@ -40,14 +40,4 @@ return [
     |
     */
     'excluded_paths' => [],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Excluded languages
-    |--------------------------------------------------------------------------
-    |
-    | Which languages to exclude when scanning for missing translations.
-    |
-    */
-    'excluded_languages' => ['en'],
 ];

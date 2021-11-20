@@ -1,56 +1,55 @@
 {
-    "name": "druc/laravel-langscanner",
-    "description": "Scan missing language translations.",
-    "keywords": [
-        "druc",
-        "laravel-langscanner"
-    ],
-    "homepage": "https://github.com/druc/laravel-langscanner",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Constantin Druc",
-            "email": "druc@pinsmile.com",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": "^7.4|^8.0",
-        "spatie/laravel-package-tools": "^1.4.3",
-        "illuminate/contracts": "^8.0",
-        "illuminate/support": "^8.0",
-        "illuminate/filesystem": "^8.0",
-        "ext-json": "*"
-    },
-    "require-dev": {
-        "nunomaduro/collision": "^5.3",
-        "orchestra/testbench": "^6.15",
-        "phpunit/phpunit": "^9.3"
-    },
-    "autoload": {
-        "psr-4": {
-            "Druc\\Langscanner\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Druc\\Langscanner\\Tests\\": "tests"
-        }
-    },
-    "scripts": {
-        "test": "./vendor/bin/testbench package:test",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Druc\\Langscanner\\LangscannerServiceProvider"
-            ]
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+  "name": "druc/laravel-langscanner",
+  "description": "Scan missing language translations.",
+  "keywords": [
+    "druc",
+    "laravel-langscanner"
+  ],
+  "homepage": "https://github.com/druc/laravel-langscanner",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Constantin Druc",
+      "email": "druc@pinsmile.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.4|^8.0",
+    "spatie/laravel-package-tools": "^1.4.3",
+    "illuminate/contracts": "^8.0",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.3",
+    "nunomaduro/collision": "^5.3",
+    "orchestra/testbench": "^6.15",
+    "phpunit/phpunit": "^9.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Druc\\Langscanner\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Druc\\Langscanner\\Tests\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "./vendor/bin/testbench package:test",
+    "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Druc\\Langscanner\\LangscannerServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

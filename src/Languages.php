@@ -7,28 +7,27 @@ use Illuminate\Support\Collection;
 
 class Languages
 {
-    private Filesystem $disk;
-    private array $excludedLanguages;
-    private string $path;
+    private array $languages;
 
-    public function __construct(Filesystem $disk, string $path, array $excludedLanguages)
+    public function __construct(array $languages)
     {
-        $this->disk = $disk;
-        $this->path = $path;
-        $this->excludedLanguages = $excludedLanguages;
+        $this->languages = $languages;
     }
 
-    public function toArray(): array
+    public static function fromPath(string $path, Filesystem $filesystem = null): self
     {
-        return Collection::make($this->disk->files($this->path))
-            ->filter(function ($file) {
-                return $file->getExtension() === 'json';
-            })->map(function ($file) {
-                return $file->getFilenameWithoutExtension();
-            })->filter(function ($lang) {
-                return !in_array($lang, $this->excludedLanguages);
-            })
+        $filesystem ??= resolve(Filesystem::class);
+        $languages = Collection::make($filesystem->files($path))
+            ->filter(fn ($file) => $file->getExtension() === 'json')
+            ->map(fn ($file) => $file->getFilenameWithoutExtension())
             ->values()
             ->toArray();
+
+        return new self($languages);
+    }
+
+    public function all(): array
+    {
+        return $this->languages;
     }
 }

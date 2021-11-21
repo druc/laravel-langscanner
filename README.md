@@ -1,6 +1,7 @@
 # laravel-langscanner
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/druc/laravel-langscanner.svg?style=flat-square)](https://packagist.org/packages/druc/laravel-langscanner)
+[![Tests](https://github.com/druc/laravel-langscanner/actions/workflows/run-tests.yml/badge.svg?branch=master)](https://github.com/druc/laravel-langscanner/actions/workflows/run-tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/druc/laravel-langscanner.svg?style=flat-square)](https://packagist.org/packages/druc/laravel-langscanner)
 
 This package scans your project for missing translation keys and then writes them into individual json files for you to fill in.

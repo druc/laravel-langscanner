@@ -2,8 +2,10 @@
 
 namespace Druc\Langscanner\Commands;
 
+use Druc\Langscanner\CachedFileTranslations;
 use Druc\Langscanner\FileTranslations;
 use Druc\Langscanner\Languages;
+use Druc\Langscanner\MissingTranslations;
 use Druc\Langscanner\RequiredTranslations;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -11,51 +13,45 @@ use Illuminate\Filesystem\Filesystem;
 class LangscannerCommand extends Command
 {
     protected $signature = 'langscanner {language?}';
-    protected $description = "Finds keys without a corresponding translation and writes them into the translation (json) files.";
+    protected $description = "Updates translation files with missing translation keys.";
 
-    public function handle(Filesystem $filesystem)
+    public function handle(Filesystem $filesystem): void
     {
         if ($this->argument('language')) {
-            $languages = [$this->argument('language')];
+            $languages = new Languages([$this->argument('language')]);
         } else {
-            $languages = (new Languages($filesystem, resource_path('lang'), config('langscanner.excluded_languages')))->toArray();
+            $languages = Languages::fromPath(resource_path('lang'), $filesystem);
         }
 
-        $requiredTranslations = (new RequiredTranslations($filesystem, config('langscanner')))->toArray();
+        foreach ($languages->all() as $language) {
+            $fileTranslations = new CachedFileTranslations(
+                new FileTranslations(['language' => $language])
+            );
 
-        $rows = [];
+            $missingTranslations = new MissingTranslations(
+                new RequiredTranslations(config('langscanner')),
+                $fileTranslations
+            );
 
-        foreach ($languages as $language) {
-            if ($filesystem->exists(resource_path("lang/$language.json"))) {
-                $existingTranslations = json_decode($filesystem->get(resource_path("lang/$language.json")), true);
-            } else {
-                $existingTranslations = [];
-            }
-
-            $missingTranslations = $this->missingTranslations($requiredTranslations, $existingTranslations);
-
-            foreach ($missingTranslations as $key => $path) {
-                $rows[] = [$language, $key, $path];
-            }
-
+            $fileTranslations->update(
             // sets translation values to empty string
-            $missingTranslations = array_fill_keys(array_keys($missingTranslations), '');
-            (new FileTranslations(resource_path("lang/$language.json")))->update($missingTranslations);
-        }
+                array_fill_keys(
+                    array_keys($missingTranslations->all()),
+                    ''
+                )
+            );
 
-        $this->table(["Language", "Key", "Path"], $rows);
-    }
+            // Render table
+            $this->comment(PHP_EOL);
+            $this->comment(strtoupper($language) . " missing translations:");
 
-    private function missingTranslations(array $required, array $existing): array
-    {
-        $missing = [];
+            $rows = [];
 
-        foreach ($required as $key => $value) {
-            if (empty($existing[$key])) {
-                $missing[$key] = $value;
+            foreach ($missingTranslations->all() as $key => $path) {
+                $rows[] = [$key, $path];
             }
-        }
 
-        return $missing;
+            $this->table(["Key", "Path"], $rows);
+        }
     }
 }

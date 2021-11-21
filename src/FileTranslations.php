@@ -2,26 +2,53 @@
 
 namespace Druc\Langscanner;
 
-class FileTranslations
-{
-    private string $path;
+use Illuminate\Filesystem\Filesystem;
+use Webmozart\Assert\Assert;
 
-    public function __construct(string $path)
+class FileTranslations implements Contracts\FileTranslations
+{
+    private string $language;
+    private string $rootPath;
+    private Filesystem $disk;
+
+    public function __construct(array $opts)
     {
-        $this->path = $path;
+        Assert::keyExists($opts, 'language');
+
+        $this->language = $opts['language'];
+        $this->disk = $opts['disk'] ?? resolve(Filesystem::class);
+        $this->rootPath = $opts['rootPath'] ?? resource_path('lang/');
     }
 
-    public function update(array $translations)
+    public function language(): string
     {
-        if (file_exists($this->path)) {
-            $existingTranslations = json_decode(file_get_contents($this->path), true);
-        } else {
-            $existingTranslations = [];
-        }
+        return $this->language;
+    }
 
-        $translations = array_merge($existingTranslations, $translations);
+    public function update(array $translations): void
+    {
+        $translations = array_merge($this->all(), $translations);
         $translations = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        file_put_contents($this->path, $translations);
+        $this->disk->put($this->path(), $translations);
+    }
+
+    public function all(): array
+    {
+        if (file_exists($this->path())) {
+            return json_decode($this->disk->get($this->path()), true);
+        }
+
+        return [];
+    }
+
+    public function contains(string $key): bool
+    {
+        return !empty($this->all()[$key]);
+    }
+
+    private function path(): string
+    {
+        return $this->rootPath . "{$this->language()}.json";
     }
 }

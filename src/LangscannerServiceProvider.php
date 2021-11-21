@@ -3,7 +3,6 @@
 namespace Druc\Langscanner;
 
 use Druc\Langscanner\Commands\LangscannerCommand;
-use Druc\Langscanner\Commands\LangscannerInitCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 

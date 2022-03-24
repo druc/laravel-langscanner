@@ -2,29 +2,31 @@
 
 namespace Druc\Langscanner;
 
+use Druc\Langscanner\Contracts\FileTranslations;
+use Illuminate\Support\Collection;
+
 class MissingTranslations
 {
     private RequiredTranslations $requiredTranslations;
-    private ExistingTranslations $existingTranslations;
+    private FileTranslations $fileTranslations;
 
-    public function __construct(RequiredTranslations $requiredTranslations, ExistingTranslations $existingTranslations)
-    {
+    public function __construct(
+        RequiredTranslations $requiredTranslations,
+        FileTranslations $fileTranslations
+    ) {
         $this->requiredTranslations = $requiredTranslations;
-        $this->existingTranslations = $existingTranslations;
+        $this->fileTranslations = $fileTranslations;
     }
 
-    public function toArray(): array
+    public function all(): array
     {
-        $requiredTranslations = $this->requiredTranslations->toArray();
-        $existingTranslations = $this->existingTranslations->toArray();
-        $missing = [];
+        return Collection::make($this->requiredTranslations->all())
+            ->filter(fn ($value, $key) => !$this->fileTranslations->contains($key))
+            ->toArray();
+    }
 
-        foreach ($requiredTranslations as $key => $value) {
-            if (empty($existingTranslations[$key])) {
-                $missing[$key] = $value;
-            }
-        }
-
-        return $missing;
+    public function language(): string
+    {
+        return $this->fileTranslations->language();
     }
 }

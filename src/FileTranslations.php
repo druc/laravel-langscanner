@@ -2,26 +2,53 @@
 
 namespace Druc\Langscanner;
 
-class FileTranslations
-{
-    private string $path;
+use Illuminate\Filesystem\Filesystem;
+use Webmozart\Assert\Assert;
 
-    public function __construct(string $path)
+class FileTranslations implements Contracts\FileTranslations
+{
+    private string $language;
+    private string $rootPath;
+    private Filesystem $disk;
+
+    public function __construct(array $opts)
     {
-        $this->path = $path;
+        Assert::keyExists($opts, 'language');
+
+        $this->language = $opts['language'];
+        $this->disk = $opts['disk'] ?? resolve(Filesystem::class);
+        $this->rootPath = $opts['rootPath'] ?? resource_path('lang/');
     }
 
-    public function update(MissingTranslations $missingTranslations)
+    public function language(): string
     {
-        $existingTranslations = file_get_contents($this->path);
-        $existingTranslations = json_decode($existingTranslations, true);
+        return $this->language;
+    }
 
-        // Sets keys to an empty string: ['needs translation' => '', etc]
-        $unfilledTranslations = array_fill_keys(array_keys($missingTranslations->toArray()), '');
+    public function update(array $translations): void
+    {
+        $translations = array_merge($this->all(), $translations);
+        $translations = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        $mergedTranslations = array_merge($existingTranslations, $unfilledTranslations);
-        $mergedTranslations = json_encode($mergedTranslations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->disk->put($this->path(), $translations);
+    }
 
-        file_put_contents($this->path, $mergedTranslations);
+    public function all(): array
+    {
+        if (file_exists($this->path())) {
+            return json_decode($this->disk->get($this->path()), true);
+        }
+
+        return [];
+    }
+
+    public function contains(string $key): bool
+    {
+        return !empty($this->all()[$key]);
+    }
+
+    private function path(): string
+    {
+        return $this->rootPath . "{$this->language()}.json";
     }
 }

@@ -2,55 +2,56 @@
 
 namespace Druc\Langscanner\Commands;
 
-use Druc\Langscanner\ExistingTranslations;
+use Druc\Langscanner\CachedFileTranslations;
 use Druc\Langscanner\FileTranslations;
+use Druc\Langscanner\Languages;
 use Druc\Langscanner\MissingTranslations;
-use Druc\Langscanner\RequiredLanguages;
 use Druc\Langscanner\RequiredTranslations;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
 class LangscannerCommand extends Command
 {
-    protected $signature = 'langscanner';
-    protected $description = "Finds keys without a corresponding translations and writes them into the translation (json) files.";
+    protected $signature = 'langscanner {language?}';
+    protected $description = "Updates translation files with missing translation keys.";
 
-    public function handle()
+    public function handle(Filesystem $filesystem): void
     {
-        $headers = ["Language", "Key", "Path"];
-        $rows = [];
+        if ($this->argument('language')) {
+            $languages = new Languages([$this->argument('language')]);
+        } else {
+            $languages = Languages::fromPath(resource_path('lang'), $filesystem);
+        }
 
-        $languages = new RequiredLanguages(
-            new Filesystem,
-            config('langscanner.languages_path'),
-            config('langscanner.excluded_languages')
-        );
+        foreach ($languages->all() as $language) {
+            $fileTranslations = new CachedFileTranslations(
+                new FileTranslations(['language' => $language])
+            );
 
-        $requiredTranslations = new RequiredTranslations(
-            new Filesystem,
-            config('langscanner.paths'),
-            config('langscanner.excluded_paths'),
-            config('langscanner.translation_methods')
-        );
-
-        foreach ($languages->toArray() as $language) {
             $missingTranslations = new MissingTranslations(
-                $requiredTranslations,
-                new ExistingTranslations(
-                    new Filesystem,
-                    config('langscanner.languages_path'),
-                    $language
+                new RequiredTranslations(config('langscanner')),
+                $fileTranslations
+            );
+
+            $fileTranslations->update(
+            // sets translation values to empty string
+                array_fill_keys(
+                    array_keys($missingTranslations->all()),
+                    ''
                 )
             );
 
-            foreach ($missingTranslations->toArray() as $key => $path) {
-                $rows[] = [$language, $key, $path];
+            // Render table
+            $this->comment(PHP_EOL);
+            $this->comment(strtoupper($language) . " missing translations:");
+
+            $rows = [];
+
+            foreach ($missingTranslations->all() as $key => $path) {
+                $rows[] = [$key, $path];
             }
 
-            (new FileTranslations(config('langscanner.languages_path')."/$language.json"))
-                ->update($missingTranslations);
+            $this->table(["Key", "Path"], $rows);
         }
-
-        $this->table($headers, $rows);
     }
 }

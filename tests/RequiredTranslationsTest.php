@@ -8,13 +8,15 @@ use Illuminate\Filesystem\Filesystem;
 class RequiredTranslationsTest extends TestCase
 {
     /** @test */
-    public function it_finds_all_required_translations()
+    public function it_finds_all_required_translations(): void
     {
         $requiredTranslations = new RequiredTranslations(
-            new Filesystem,
-            [__DIR__.'/fixtures/test-files'],
-            [],
-            ['__', 'trans', 'trans_choice', '@lang', 'Lang::get']
+            [
+                'paths' => [__DIR__ . '/fixtures/test-files'],
+                'excluded_paths' => [],
+                'translation_methods' => ['__', 'trans', 'trans_choice', '@lang', 'Lang::get'],
+            ],
+            new Filesystem(),
         );
 
         $this->assertEquals([
@@ -26,6 +28,6 @@ class RequiredTranslationsTest extends TestCase
             'trans' => 'trans.txt',
             'trans.third_match' => 'trans.txt',
             'trans_choice.with_params' => 'trans_choice.txt',
-        ], $requiredTranslations->toArray());
+        ], $requiredTranslations->all());
     }
 }

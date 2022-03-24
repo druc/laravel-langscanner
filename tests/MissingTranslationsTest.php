@@ -2,32 +2,34 @@
 
 namespace Druc\Langscanner\Tests;
 
-use Druc\Langscanner\ExistingTranslations;
+use Druc\Langscanner\FileTranslations;
 use Druc\Langscanner\MissingTranslations;
 use Druc\Langscanner\RequiredTranslations;
+use Mockery\MockInterface;
 
 class MissingTranslationsTest extends TestCase
 {
     /** @test */
-    public function it_finds_all_missing_translations()
+    public function it_finds_missing_translations(): void
     {
-        $requiredTranslations = $this->createMock(RequiredTranslations::class);
-        $requiredTranslations->method('toArray')
-            ->willReturn([
-                "This will go in the JSON array" => "__.txt",
-                "lang.first_match" => "alt_lang.txt",
+        $requiredTranslations = $this->mock(RequiredTranslations::class, function (MockInterface $mock) {
+            $mock->shouldReceive("all")->andReturn([
+                'Existing translation' => 'app.blade.php',
+                'Missing translation' => 'app.blade.php',
             ]);
+        });
 
-        $existingTranslations = $this->createMock(ExistingTranslations::class);
-        $existingTranslations->method("toArray")
-            ->willReturn([
-                "lang.first_match" => "This translation exists so...",
-            ]);
+        $fileTranslations = $this->mock(FileTranslations::class, function (MockInterface $mock) {
+            $mock->shouldReceive("contains")->with("Existing translation")->andReturn(true);
+            $mock->shouldReceive("contains")->with("Missing translation")->andReturn(false);
+        });
 
-        $missingTranslations = new MissingTranslations($requiredTranslations, $existingTranslations);
+        $missingTranslations = (new MissingTranslations(
+            $requiredTranslations,
+            $fileTranslations
+        ))->all();
 
-        $this->assertEquals([
-            "This will go in the JSON array" => "__.txt",
-        ], $missingTranslations->toArray());
+        $this->assertArrayHasKey("Missing translation", $missingTranslations);
+        $this->assertArrayNotHasKey("Existing translation", $missingTranslations);
     }
 }

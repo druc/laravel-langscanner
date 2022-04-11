@@ -15,17 +15,20 @@ class RequiredTranslations
     private array $translationMethods;
     private array $excludedPaths;
     private array $translations;
+    private string $langDirPath;
 
     public function __construct(array $options, Filesystem $disk = null)
     {
         Assert::keyExists($options, 'paths');
         Assert::keyExists($options, 'excluded_paths');
         Assert::keyExists($options, 'translation_methods');
+        Assert::keyExists($options, 'lang_dir_path');
 
         $this->disk = $disk ?? resolve(Filesystem::class);
         $this->paths = $options['paths'];
         $this->excludedPaths = $options['excluded_paths'];
         $this->translationMethods = $options['translation_methods'];
+        $this->langDirPath = $options['lang_dir_path'];
     }
 
     public function all(): array
@@ -63,7 +66,7 @@ class RequiredTranslations
 
     private function existingPhpTranslations(): array
     {
-        return Collection::make($this->disk->allFiles(resource_path('lang')))
+        return Collection::make($this->disk->allFiles($this->langDirPath))
             ->filter(fn ($file) => $file->getExtension() === 'php')
             ->reduce(function ($carry, $file) {
                 $translations = $this->disk->getRequire($file->getRealPath());

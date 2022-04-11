@@ -17,7 +17,7 @@ class FileTranslations implements Contracts\FileTranslations
 
         $this->language = $opts['language'];
         $this->disk = $opts['disk'] ?? resolve(Filesystem::class);
-        $this->rootPath = $opts['rootPath'] ?? resource_path('lang/');
+        $this->rootPath = $opts['rootPath'] ?? config('langscanner.lang_dir_path') . '/';
     }
 
     public function language(): string

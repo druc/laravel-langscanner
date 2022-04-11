@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'lang_dir_path' => base_path('lang'),
     /*
     |--------------------------------------------------------------------------
     | Translation methods

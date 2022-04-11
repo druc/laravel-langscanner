@@ -20,7 +20,7 @@ class LangscannerCommand extends Command
         if ($this->argument('language')) {
             $languages = new Languages([$this->argument('language')]);
         } else {
-            $languages = Languages::fromPath(resource_path('lang'), $filesystem);
+            $languages = Languages::fromPath(config('langscanner.lang_dir_path'), $filesystem);
         }
 
         foreach ($languages->all() as $language) {

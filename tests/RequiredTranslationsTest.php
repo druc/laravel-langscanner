@@ -15,6 +15,7 @@ class RequiredTranslationsTest extends TestCase
                 'paths' => [__DIR__ . '/fixtures/test-files'],
                 'excluded_paths' => [],
                 'translation_methods' => ['__', 'trans', 'trans_choice', '@lang', 'Lang::get'],
+                'lang_dir_path' => base_path('lang')
             ],
             new Filesystem(),
         );

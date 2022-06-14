@@ -88,11 +88,13 @@ class RequiredTranslations
             "(?<!->)" . // Must not start with ->
             '(' . implode('|', $this->translationMethods) . ')' .// Must start with one of the functions
             "\(" .// Match opening parentheses
+            "[\s\S]?" .// Ignore new lines
             "[\'\"]" .// Match " or '
             "(" .// Start a new group to match:
             ".*" .// Must start with group
             ")" .// Close group
             "[\'\"]" .// Closing quote
+            "[\s\S]?" .// Ignore new lines
             "[\),]" . // Close parentheses or new parameter
             "/siuU";
     }

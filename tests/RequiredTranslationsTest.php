@@ -22,6 +22,7 @@ class RequiredTranslationsTest extends TestCase
 
         $this->assertEquals([
             'Well this is ackward' => '__.txt',
+            'Well this is even more ackward' => '__.txt',
             'This will go in the JSON array' => '__.txt',
             'lang.first_match' => 'alt_lang.txt',
             'lang_get.first' => 'lang_get.txt',

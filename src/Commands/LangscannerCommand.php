@@ -34,7 +34,7 @@ class LangscannerCommand extends Command
             );
 
             $fileTranslations->update(
-            // sets translation values to empty string
+                // sets translation values to empty string
                 array_fill_keys(
                     array_keys($missingTranslations->all()),
                     ''

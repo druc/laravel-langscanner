@@ -9,7 +9,7 @@ class FileTranslations implements Contracts\FileTranslations
 {
     private string $language;
     private string $rootPath;
-    private bool $saveUndotted;
+    private bool $saveDottedItemsAsArray;
     private Filesystem $disk;
 
     public function __construct(array $opts)
@@ -19,7 +19,7 @@ class FileTranslations implements Contracts\FileTranslations
         $this->language = $opts['language'];
         $this->disk = $opts['disk'] ?? resolve(Filesystem::class);
         $this->rootPath = $opts['rootPath'] ?? config('langscanner.lang_dir_path') . '/';
-        $this->saveUndotted = $opts['saveUndotted'] ?? false;
+        $this->saveDottedItemsAsArray = config('langscanner.save_dotted_items_as_array', false);
     }
 
     public function language(): string
@@ -31,7 +31,7 @@ class FileTranslations implements Contracts\FileTranslations
     {
         $translations = array_merge($this->all(), $translations);
 
-        if ($this->saveUndotted) {
+        if ($this->saveDottedItemsAsArray) {
             $translations = collect($translations)->undot()->toArray();
         }
 

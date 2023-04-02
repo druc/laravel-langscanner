@@ -41,4 +41,16 @@ return [
     |
     */
     'excluded_paths' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Save dotted items as array
+    |--------------------------------------------------------------------------
+    |
+    | Uses collect()->undot() to save the items in the JSON files as multi-level
+    | array instead of a flat array. Better for reability and management for large
+    | json files
+    |
+    */
+    'save_dotted_items_as_array' => false
 ];

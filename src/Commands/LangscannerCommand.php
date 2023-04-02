@@ -12,7 +12,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class LangscannerCommand extends Command
 {
-    protected $signature = 'langscanner {language?}';
+    protected $signature = 'langscanner {language?} --undot';
     protected $description = "Updates translation files with missing translation keys.";
 
     public function handle(Filesystem $filesystem): void
@@ -23,9 +23,11 @@ class LangscannerCommand extends Command
             $languages = Languages::fromPath(config('langscanner.lang_dir_path'), $filesystem);
         }
 
+        $saveUndotted = $this->option('undot');
+
         foreach ($languages->all() as $language) {
             $fileTranslations = new CachedFileTranslations(
-                new FileTranslations(['language' => $language])
+                new FileTranslations(['language' => $language, 'saveUndotted' => $saveUndotted])
             );
 
             $missingTranslations = new MissingTranslations(

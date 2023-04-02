@@ -9,6 +9,7 @@ class FileTranslations implements Contracts\FileTranslations
 {
     private string $language;
     private string $rootPath;
+    private bool $saveUndotted;
     private Filesystem $disk;
 
     public function __construct(array $opts)
@@ -18,6 +19,7 @@ class FileTranslations implements Contracts\FileTranslations
         $this->language = $opts['language'];
         $this->disk = $opts['disk'] ?? resolve(Filesystem::class);
         $this->rootPath = $opts['rootPath'] ?? config('langscanner.lang_dir_path') . '/';
+        $this->saveUndotted = $opts['saveUndotted'] ?? false;
     }
 
     public function language(): string
@@ -28,6 +30,11 @@ class FileTranslations implements Contracts\FileTranslations
     public function update(array $translations): void
     {
         $translations = array_merge($this->all(), $translations);
+
+        if ($this->saveUndotted) {
+            $translations = collect($translations)->undot()->toArray();
+        }
+
         $translations = json_encode($translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         $this->disk->put($this->path(), $translations);

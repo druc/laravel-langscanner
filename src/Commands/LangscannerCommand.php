@@ -35,10 +35,10 @@ class LangscannerCommand extends Command
 
             $fileTranslations->update(
                 // sets translation values to empty string
-                array_fill_keys(
+              config("langscanner.keys_lang") === $language?  array_combine(
                     array_keys($missingTranslations->all()),
-                    ''
-                )
+                    array_keys($missingTranslations->all())
+                ):array_fill_keys(array_keys($missingTranslations->all()),'')
             );
 
             // Render table

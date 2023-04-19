@@ -41,4 +41,14 @@ return [
     |
     */
     'excluded_paths' => [],
+    /*
+    |--------------------------------------------------------------------------
+    | Language of the translation keys
+    |--------------------------------------------------------------------------
+    |
+    | If this is set to some language the translation values for this language
+    | will be the same as the keys instead of empty strings
+    |
+    */
+    'keys_lang'=>'',
 ];
